@@ -1,5 +1,3 @@
-// +build mysql
-
 // Package mysql is a database adapter for MySQL.
 package mysql
 
@@ -2798,6 +2796,6 @@ func extractTags(update map[string]interface{}) []string {
 	return []string(tags)
 }
 
-func init() {
+func Init() {
 	store.RegisterAdapter(&adapter{})
 }

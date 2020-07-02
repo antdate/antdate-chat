@@ -36,7 +36,7 @@ import (
 
 	// Database backends
 	_ "github.com/tinode/chat/server/db/mongodb"
-	_ "github.com/tinode/chat/server/db/mysql"
+	mysql "github.com/tinode/chat/server/db/mysql"
 	_ "github.com/tinode/chat/server/db/rethinkdb"
 
 	// Push notifications
@@ -242,6 +242,9 @@ type configType struct {
 }
 
 func main() {
+
+	mysql.Init()
+
 	executable, _ := os.Executable()
 
 	// All relative paths are resolved against the executable path, not against current working directory.
