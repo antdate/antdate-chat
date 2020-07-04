@@ -35,8 +35,8 @@ import (
 	_ "github.com/tinode/chat/server/auth/token"
 
 	// Database backends
+	mysql "github.com/tinode/chat/server/db/grpc"
 	_ "github.com/tinode/chat/server/db/mongodb"
-	mysql "github.com/tinode/chat/server/db/mysql"
 	_ "github.com/tinode/chat/server/db/rethinkdb"
 
 	// Push notifications
