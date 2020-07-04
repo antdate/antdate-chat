@@ -4,6 +4,7 @@ package store
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -35,6 +36,7 @@ type configType struct {
 
 func openAdapter(workerId int, jsonconf json.RawMessage) error {
 	var config configType
+	fmt.Println(string(jsonconf))
 	if err := json.Unmarshal(jsonconf, &config); err != nil {
 		return errors.New("store: failed to parse config: " + err.Error() + "(" + string(jsonconf) + ")")
 	}
@@ -66,6 +68,7 @@ func openAdapter(workerId int, jsonconf json.RawMessage) error {
 		return errors.New("store: invalid worker ID")
 	}
 
+	fmt.Println(uint(workerId), string(config.UidKey))
 	if err := uGen.Init(uint(workerId), config.UidKey); err != nil {
 		return errors.New("store: failed to init snowflake: " + err.Error())
 	}

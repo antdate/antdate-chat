@@ -12,6 +12,7 @@ package main
 import (
 	"container/list"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -719,6 +720,7 @@ func (s *Session) login(msg *ClientComMessage) {
 
 	// If authenticator did not check user state, it returns state "undef". If so, check user state here.
 	if rec.State == types.StateUndefined {
+		fmt.Println("uid", rec.Uid)
 		rec.State, err = userGetState(rec.Uid)
 	}
 	if err == nil && rec.State != types.StateOK {

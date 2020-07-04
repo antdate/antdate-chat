@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -80,6 +81,8 @@ func (a *authenticator) Init(jsonconf json.RawMessage, name string) error {
 		UseSeparateEndpoints bool `json:"use_separate_endpoints"`
 	}
 
+	fmt.Println(string(jsonconf))
+
 	var config configType
 	err := json.Unmarshal(jsonconf, &config)
 	if err != nil {
@@ -87,6 +90,9 @@ func (a *authenticator) Init(jsonconf json.RawMessage, name string) error {
 	}
 
 	serverUrl, err := url.Parse(config.ServerUrl)
+
+	fmt.Printf("serverUrl:%+v \n url:%s", serverUrl, config.ServerUrl)
+
 	if err != nil || !serverUrl.IsAbs() {
 		return errors.New("auth_rest: invalid server_url")
 	}
@@ -165,10 +171,13 @@ func (a *authenticator) UpdateRecord(rec *auth.Rec, secret []byte) (*auth.Rec, e
 
 // Authenticate: get user record by provided secret
 func (a *authenticator) Authenticate(secret []byte) (*auth.Rec, []byte, error) {
+	secret = []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2UiOjk5LCJhdmF0YXIiOiJodHRwOmQyMzMzZWVlZTIyMmRkIiwiZW1haWwiOiJidW96dW1laUBnbWFpbC5jb20iLCJleHAiOjE1OTY0NDEwNzUsImlkIjoiMTkiLCJsZXZlbCI6MCwibmlja25hbWUiOiIiLCJvcmlnX2lhdCI6MTU5Mzg0OTA3NSwicGFzc3dvcmQiOiIzYjc5MzZlYzIyYjE1Nzc2NWQ0OGFiYjA3OTY0MTAxMSIsInBob25lIjoiMTY2MDExNjM1NTEiLCJzZXgiOjF9.Qe5zGlFrwp94UjJYDs5BJomOoWp39C3epg3Vtd9bljk")
 	resp, err := a.callEndpoint("auth", nil, secret)
 	if err != nil {
 		return nil, nil, err
 	}
+
+	fmt.Printf("resp:%+v \n", resp.Record)
 
 	// Check if server provided a user ID. If not, create a new account in the local database.
 	if resp.Record.Uid.IsZero() && a.allowNewAccounts {
@@ -231,6 +240,7 @@ func (a *authenticator) DelRecords(uid types.Uid) error {
 
 // RestrictedTags returns tag namespaces restricted by the server.
 func (a *authenticator) RestrictedTags() ([]string, error) {
+	return []string{"tel"}, nil
 	resp, err := a.callEndpoint("rtagns", nil, nil)
 	if err != nil {
 		return nil, err
