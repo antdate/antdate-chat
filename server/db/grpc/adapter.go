@@ -531,7 +531,7 @@ func (a *adapter) UpgradeDb() error {
 
 	if a.version == 109 {
 		// Perform database upgrade from version 109 to version 110.
-		if _, err := a.db.Exec(`UPDATE topics SET touchedat=updatedat WHERE touchedat IS NULL`); err != nil {
+		if _, err := a.db.Exec(`UPDATE chat_topics SET touchedat=updatedat WHERE touchedat IS NULL`); err != nil {
 			return err
 		}
 
@@ -564,20 +564,20 @@ func (a *adapter) UpgradeDb() error {
 		}
 
 		// Topics
-		if _, err := a.db.Exec("ALTER TABLE topics ADD state SMALLINT NOT NULL DEFAULT 0 AFTER updatedat"); err != nil {
+		if _, err := a.db.Exec("ALTER TABLE chat_topics ADD state SMALLINT NOT NULL DEFAULT 0 AFTER updatedat"); err != nil {
 			return err
 		}
 
-		if _, err := a.db.Exec("ALTER TABLE topics CHANGE deletedat stateat DATETIME(3)"); err != nil {
+		if _, err := a.db.Exec("ALTER TABLE chat_topics CHANGE deletedat stateat DATETIME(3)"); err != nil {
 			return err
 		}
 
 		// Add status to formerly soft-deleted topics.
-		if _, err := a.db.Exec("UPDATE topics SET state=? WHERE stateat IS NOT NULL", t.StateDeleted); err != nil {
+		if _, err := a.db.Exec("UPDATE chat_topics SET state=? WHERE stateat IS NOT NULL", t.StateDeleted); err != nil {
 			return err
 		}
 
-		if _, err := a.db.Exec("ALTER TABLE topics ADD INDEX topics_state(state)"); err != nil {
+		if _, err := a.db.Exec("ALTER TABLE chat_topics ADD INDEX topics_state(state)"); err != nil {
 			return err
 		}
 
@@ -600,7 +600,7 @@ func (a *adapter) UpgradeDb() error {
 
 func createSystemTopic(tx *sql.Tx) error {
 	now := t.TimeNow()
-	sql := `INSERT INTO topics(createdat,updatedat,state,touchedat,name,access,public)
+	sql := `INSERT INTO chat_topics(createdat,updatedat,state,touchedat,name,access,public)
 				VALUES(?,?,?,?,'sys','{"Auth": "N","Anon": "N"}','{"fn": "System"}')`
 	_, err := tx.Exec(sql, now, now, t.StateOK, now)
 	return err
@@ -917,11 +917,11 @@ func (a *adapter) UserDelete(uid t.Uid, hard bool) error {
 		// Delete topics where the user is the owner.
 
 		// First delete all messages in those topics.
-		if _, err = tx.Exec("DELETE chat_dellog FROM dellog LEFT JOIN topics ON topics.name=dellog.topic WHERE topics.owner=?",
+		if _, err = tx.Exec("DELETE chat_dellog FROM dellog LEFT JOIN chat_topics ON chat_topics.name=dellog.topic WHERE chat_topics.owner=?",
 			decoded_uid); err != nil {
 			return err
 		}
-		if _, err = tx.Exec("DELETE chat_messages FROM messages LEFT JOIN topics ON topics.name=messages.topic WHERE topics.owner=?",
+		if _, err = tx.Exec("DELETE chat_messages FROM messages LEFT JOIN chat_topics ON chat_topics.name=messages.topic WHERE chat_topics.owner=?",
 			decoded_uid); err != nil {
 			return err
 		}
@@ -1371,7 +1371,7 @@ func (a *adapter) TopicsForUser(uid t.Uid, keepDeleted bool, opts *t.QueryOpt) (
 		// Fetch grp & p2p topics
 		q, topq, _ := sqlx.In(
 			"SELECT createdat,updatedat,state,stateat,touchedat,name AS id,access,seqid,delid,public,tags "+
-				"FROM topics WHERE name IN (?)", topq)
+				"FROM chat_topics WHERE name IN (?)", topq)
 		// Optionally skip deleted topics.
 		if !keepDeleted {
 			q += " AND state!=?"

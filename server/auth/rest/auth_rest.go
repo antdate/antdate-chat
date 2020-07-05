@@ -171,7 +171,7 @@ func (a *authenticator) UpdateRecord(rec *auth.Rec, secret []byte) (*auth.Rec, e
 
 // Authenticate: get user record by provided secret
 func (a *authenticator) Authenticate(secret []byte) (*auth.Rec, []byte, error) {
-	secret = []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2UiOjk5LCJhdmF0YXIiOiJodHRwOmQyMzMzZWVlZTIyMmRkIiwiZW1haWwiOiJidW96dW1laUBnbWFpbC5jb20iLCJleHAiOjE1OTY0NDEwNzUsImlkIjoiMTkiLCJsZXZlbCI6MCwibmlja25hbWUiOiIiLCJvcmlnX2lhdCI6MTU5Mzg0OTA3NSwicGFzc3dvcmQiOiIzYjc5MzZlYzIyYjE1Nzc2NWQ0OGFiYjA3OTY0MTAxMSIsInBob25lIjoiMTY2MDExNjM1NTEiLCJzZXgiOjF9.Qe5zGlFrwp94UjJYDs5BJomOoWp39C3epg3Vtd9bljk")
+	secret = []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2UiOjk5LCJhdmF0YXIiOiJodHRwOmQyMzMzZWVlZTIyMmRkIiwiZW1haWwiOiJidW96dW1laUBnbWFpbC5jb20iLCJleHAiOjE1OTY1NTQxMzMsImlkIjoiNzUxNzU1ODczOTMxNDk3NDcyIiwibGV2ZWwiOjAsIm5pY2tuYW1lIjoiIiwib3JpZ19pYXQiOjE1OTM5NjIxMzMsInBhc3N3b3JkIjoiM2I3OTM2ZWMyMmIxNTc3NjVkNDhhYmIwNzk2NDEwMTEiLCJwaG9uZSI6IjE2NjAxMTYzNTUxIiwic2V4IjoxfQ.QWwSc147ZkXIPR2jUjQGGxbygrFCUV2TH18wkBVWRPw")
 	resp, err := a.callEndpoint("auth", nil, secret)
 	if err != nil {
 		return nil, nil, err
